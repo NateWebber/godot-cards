@@ -9,18 +9,31 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "Node",
+"class": "Card",
+"language": "GDScript",
+"path": "res://src/cards-core/card.gd"
+}, {
+"base": "Node",
+"class": "Deck",
+"language": "GDScript",
+"path": "res://src/cards-core/deck.gd"
+}, {
 "base": "",
 "class": "GitAPI",
 "language": "NativeScript",
 "path": "res://addons/godot-git-plugin/git_api.gdns"
 } ]
 _global_script_class_icons={
+"Card": "",
+"Deck": "",
 "GitAPI": ""
 }
 
 [application]
 
 config/name="Cards"
+run/main_scene="res://src/war/War.tscn"
 config/icon="res://icon.png"
 
 [editor]
