@@ -7,6 +7,7 @@ enum Suit {CLUBS, DIAMONDS, HEARTS, SPADES}
 var current_deck
 var current_card
 
+var full_ui_deck = []
 var player_one_ui_deck = []
 var player_two_ui_deck = []
 
@@ -66,42 +67,39 @@ func draw_ui_deck():
 		var newUICard = UICard.instance()
 		newUICard.set_position(Vector2(DeckSpawnPos.position.x + (i * 0.5), DeckSpawnPos.position.y))
 		add_child(newUICard)
-		if (i < 26):
-			player_one_ui_deck.append(newUICard)
-		else:
-			player_two_ui_deck.append(newUICard)
+		full_ui_deck.append(newUICard)
 	#first animation stage, fly up from bottom
-	while player_two_ui_deck[25].position.y > DeckDealAnchor1.position.y:
+	while full_ui_deck[51].position.y > DeckDealAnchor1.position.y:
+		print(full_ui_deck[51].position.y)
 		#move all cards before yield so that animation is simultaneous
-		for i in range(26):
-			var p1_card = player_one_ui_deck[i]
-			var p2_card = player_two_ui_deck[i]
-			p1_card.position.y -= CARD_ANIM_SPEED
-			p2_card.position.y -= CARD_ANIM_SPEED
+		for i in range(52):
+			full_ui_deck[i].position.y -= CARD_ANIM_SPEED
 		yield(get_tree().create_timer(0.01), "timeout")
 	#second animation stage, fly over to left of screen
-	while player_two_ui_deck[25].position.x > DeckDealAnchor2.position.x:
+	while full_ui_deck[51].position.x > DeckDealAnchor2.position.x:
 		#move all cards before yield so that animation is simultaneous
-		for i in range(26):
-			var p1_card = player_one_ui_deck[i]
-			var p2_card = player_two_ui_deck[i]
-			p1_card.position.x -= CARD_ANIM_SPEED
-			p2_card.position.x -= CARD_ANIM_SPEED
+		for i in range(52):
+			full_ui_deck[i].position.x -= CARD_ANIM_SPEED
 		yield(get_tree().create_timer(0.01), "timeout")
 	#signal this animation is done
 	emit_signal("deck_spawn_anim_complete")
 	pass
 	
 func do_deck_split_anim():
-	for i in range(26):
-		var p1_card = player_one_ui_deck[i]
-		var p2_card = player_two_ui_deck[i]
-		#redo horizontal adjustment
-		p1_card.position.x = P1DeckAnchor.position.x + (0.5 * i)
-		p2_card.position.x = P2DeckAnchor.position.x + (0.5 * i)
-		while (p1_card.position.y < P1DeckAnchor.position.y):
-			p1_card.position.y += CARD_ANIM_SPEED
-			p2_card.position.y -= CARD_ANIM_SPEED
-			yield(get_tree().create_timer(0.01), "timeout")
+	for i in range(51, -1, -1):
+		var current_ui_card = full_ui_deck[i]
+		#redo horizontal adjustment (may look weird/need further attention)
+		current_ui_card.position.x = P1DeckAnchor.position.x + 26 - (0.5 * i) #this specifically is dumb and ugly, or maybe it's the layers actually
+		if (i % 2 == 0):
+			player_one_ui_deck.append(current_ui_card)
+			while (current_ui_card.position.y < P1DeckAnchor.position.y):
+				current_ui_card.position.y += CARD_ANIM_SPEED
+				yield(get_tree().create_timer(0.01), "timeout")
+		else:
+			player_two_ui_deck.append(current_ui_card)
+			while (current_ui_card.position.y > P2DeckAnchor.position.y):
+				current_ui_card.position.y -= CARD_ANIM_SPEED
+				yield(get_tree().create_timer(0.01), "timeout")
+			
 	pass
 
